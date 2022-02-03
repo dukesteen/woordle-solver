@@ -6,11 +6,12 @@ import { validate_each_argument } from "svelte/internal";
 
 	let filteredWords = [];
 
-	function filter(template){
+	function filter(template, exceptionstring){
 		filteredWords = puzzle_words;
 
 		let containChars = [];
 		let positionalChars = [];
+		let exceptions = [...exceptionstring];
 
 		[...template].forEach((char, index) => {
 			if(char == '*'){
@@ -24,21 +25,23 @@ import { validate_each_argument } from "svelte/internal";
 			}
 		})
 
+		if(exceptions.length > 0){
+			filteredWords = puzzle_words.filter(word => exceptions.every(char => !word.includes(char)));
+		}
+
 		if(containChars.length > 0){
-			filteredWords = puzzle_words.filter(word => containChars.every(char => word.includes(char)));
+			filteredWords = filteredWords.filter(word => containChars.every(char => word.includes(char)));
 		}
 
 		positionalChars.forEach((value) => {
 			filteredWords = filteredWords.filter(word => word.charAt(value.index) == value.char.toLowerCase())
 		})
-
-		console.log(containChars);
-		console.log(positionalChars);
 	}
 
 	let templateInput = "";
+	let templateExceptions = "";
 
-	$: filter(templateInput);
+	$: filter(templateInput, templateExceptions);
 </script>
 
 <main>
@@ -53,6 +56,7 @@ import { validate_each_argument } from "svelte/internal";
 	</div>
 	<div class="template">
 		<input type="text" placeholder="template" bind:value={templateInput} maxlength="5">
+		<input type="text" placeholder="foute karakters" bind:value={templateExceptions}>
 		<span>
 			{filteredWords.sort().join(', ')}
 		</span>
