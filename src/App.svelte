@@ -21,7 +21,10 @@ import { validate_each_argument } from "svelte/internal";
 					index: index
 				})
 			} else if(char == char.toLowerCase()){
-				containChars.push(char);
+				containChars.push({
+					char: char,
+					index: index
+				});
 			}
 		})
 
@@ -30,8 +33,12 @@ import { validate_each_argument } from "svelte/internal";
 		}
 
 		if(containChars.length > 0){
-			filteredWords = filteredWords.filter(word => containChars.every(char => word.includes(char)));
+			filteredWords = filteredWords.filter(word => containChars.every(char => word.includes(char.char)));
 		}
+
+		containChars.forEach((value) => {
+			filteredWords = filteredWords.filter(word => word.charAt(value.index) != value.char.toLowerCase())
+		})
 
 		positionalChars.forEach((value) => {
 			filteredWords = filteredWords.filter(word => word.charAt(value.index) == value.char.toLowerCase())
